@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RezHub - Premium Futuristic Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- ROOT & BASE STYLES --- */
+        :root {
+            --bg-dark: #080810;
+            --bg-card: rgba(15, 15, 30, 0.65);
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-red: #ff3333;
+            --text-main: #f0f2f5;
+            --text-muted: #8a99ad;
+            --glass-border: rgba(0, 240, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- BACKGROUND FX --- */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .blur-light {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 20%;
+            left: 10%;
+            z-index: 1;
+            animation: floatLight 8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        .blur-light.alt {
+            top: 60%;
+            left: 70%;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.1) 0%, rgba(0,0,0,0) 70%);
+            animation: floatLight 12s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes floatLight {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(40px) scale(1.2); }
+        }
+
+        /* --- UTILITIES & GLOBAL FX --- */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        .neon-btn {
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .neon-btn:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .neon-btn.danger {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+        }
+        .neon-btn.danger:hover {
+            background: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.6);
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple-animation {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* --- SCREEN STATES --- */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- 1. INTRO SCREEN --- */
+        #intro-screen {
+            background: #040408;
+            z-index: 200;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .typing-container {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 15px var(--neon-blue);
+            border-right: 3px solid var(--neon-blue);
+            white-space: nowrap;
+            overflow: hidden;
+            width: 0;
+            animation: typing 2s steps(20) forwards, blink 0.75s step-end infinite;
+        }
+        .loader-bar {
+            width: 250px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .loader-progress {
+            position: absolute;
+            height: 100%;
+            width: 0;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            animation: progressLoad 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--neon-blue); } }
+        @keyframes progressLoad { to { width: 100%; } }
+
+        /* --- 2. AUTH SCREEN --- */
+        #auth-screen {
+            background: radial-gradient(circle at center, #0f0f25 0%, #05050a 100%);
+            z-index: 150;
+        }
+        .auth-container {
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-box {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .auth-box.active {
+            display: block;
+        }
+        .auth-box h2 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(0,240,255,0.3);
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .input-group input:focus {
+            border-color: var(--neon-blue);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 10px rgba(0,240,255,0.2);
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .auth-toggle span {
+            color: var(--neon-blue);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* --- 3. MAIN DASHBOARD --- */
+        #main-content {
+            display: none;
+            position: relative;
+            z-index: 5;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+        
+        /* Navbar Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(8, 8, 16, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        .menu-toggle {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .menu-toggle:hover { transform: scale(1.1); }
+        .web-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            z-index: 95;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: left 0.4s cubic-bezier(0.1, 1, 0.1, 1);
+            border-radius: 0 24px 24px 0;
+            border-left: none;
+        }
+        .sidebar.open {
+            left: 0;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 94;
+            display: none;
+        }
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: var(--neon-blue);
+            font-size: 1.3rem;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .sidebar-btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            transform: translateX(5px);
+        }
+        .sidebar-btn.logout-btn {
+            margin-top: auto;
+            border-color: rgba(255, 51, 51, 0.3);
+        }
+        .sidebar-btn.logout-btn:hover {
+            background: rgba(255, 51, 51, 0.1);
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        /* Container & Info */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .hero-section {
+            text-align: center;
+            margin: 30px 0 50px 0;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-section p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* User Profile Card */
+        .profile-card {
+            padding: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .profile-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(0,240,255,0.1);
+            border: 2px solid var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0,240,255,0.3);
+        }
+        .profile-details h4 { font-size: 1.1rem; }
+        .profile-details p { font-size: 0.85rem; color: var(--text-muted); }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 255, 127, 0.1);
+            color: #00ff7f;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+        }
+        .stat-item {
+            text-align: center;
+            background: rgba(255,255,255,0.02);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-item span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+        .stat-item strong { font-size: 1.2rem; color: var(--neon-blue); }
+
+        /* Tools Grid System */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+        .tool-card {
+            padding: 30px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        .tool-card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 240, 255, 0.2);
+            border-color: rgba(0, 240, 255, 0.4);
+        }
+        .tool-icon {
+            font-size: 2.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+        .tool-card h3 { font-size: 1.3rem; letter-spacing: 0.5px; }
+        .tool-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; flex-grow: 1; }
+        .tool-card .neon-btn { width: 100%; margin-top: 10px; }
+
+        /* --- 4. POPUP SYSTEM --- */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 4, 8, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .popup-card {
+            width: 90%;
+            max-width: 500px;
+            padding: 35px 25px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.7);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+        }
+        .popup-overlay.active .popup-card {
+            transform: scale(1);
+        }
+        .popup-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0,240,255,0.3);
+        }
+        .popup-card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 25px;
+        }
+        .popup-close-x {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .popup-close-x:hover { color: var(--neon-red); }
+
+        /* Admin Notification Alert Custom */
+        #admin-notif-popup .popup-card {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.3);
+            animation: floatingNotif 4s ease-in-out infinite;
+        }
+        .notif-header-icon {
+            font-size: 3rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px var(--neon-blue);
+        }
+        .notif-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 15px;
+            display: block;
+        }
+        @keyframes floatingNotif {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1); }
+        }
+
+        /* Account Deletion Alert */
+        #delete-popup-screen {
+            background: rgba(15, 5, 5, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 400;
+        }
+        #delete-popup-screen .popup-card {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 35px rgba(255, 51, 51, 0.4);
+            animation: shakeWarn 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes shakeWarn {
+            0% { transform: translateX(-3px) scale(1); }
+            100% { transform: translateX(3px) scale(1); }
+        }
+
+        /* --- TOAST NOTIFICATION --- */
+        .toast-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: rgba(10, 10, 20, 0.9);
+            border-left: 4px solid var(--neon-blue);
+            color: #fff;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show { transform: translateX(0); }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            .profile-card { flex-direction: column; text-align: center; }
+            .profile-info { flex-direction: column; }
+            .stats-grid { width: 100%; justify-content: center; }
+            .hero-section h1 { font-size: 2rem; }
+            .typing-container { font-size: 1.6rem; }
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+    <div class="blur-light"></div>
+    <div class="blur-light alt"></div>
+
+    <div id="intro-screen" class="screen active">
+        <div class="typing-container" id="type-text"></div>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+
+    <div id="auth-screen" class="screen">
+        <div class="auth-container glass">
+            <div id="login-box" class="auth-box active">
+                <h2>LOGIN REZHUB</h2>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="login-username" placeholder="Username" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="neon-btn" style="width:100%">LOGIN</button>
+                </form>
+                <div class="auth-toggle">
+                    Belum punya akun? <span onclick="toggleAuthForm('register')">Register</span>
+                </div>
+            </div>
+
+            <div id="register-box" class="auth-box">
+                <h2>REGISTER REZHUB</h2>
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <div class="input-group">
+                        <i class="fa-solid fa-id-card"></i>
+                        <input type="text" id="reg-fullname" placeholder="Nama Lengkap" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="reg-username" placeholder="Username" required autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Password" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-shield"></i>
+                        <input type="password" id="reg-confirm" placeholder="Konfirmasi Password" required>
+                    </div>
+                    <button type="submit" class="neon-btn" style="width:100%">REGISTER</button>
+                </form>
+                <div class="auth-toggle">
+                    Sudah punya akun? <span onclick="toggleAuthForm('login')">Login</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <header>
+            <div class="menu-toggle" onclick="toggleSidebar(true)">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+            <div class="web-title">REZHUB</div>
+            <div style="width:24px;"></div> </header>
+
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+        <nav class="sidebar glass" id="sidebar">
+            <h3>NAVIGASI</h3>
+            <button class="sidebar-btn" onclick="openWhatsApp()"><i class="fa-brands fa-whatsapp"></i> Hubungi WhatsApp</button>
+            <button class="sidebar-btn" onclick="openPolicy('privacy')"><i class="fa-solid fa-user-shield"></i> Kebijakan Privasi</button>
+            <button class="sidebar-btn" onclick="openPolicy('user')"><i class="fa-solid fa-users"></i> Kebijakan Pengguna</button>
+            <button class="sidebar-btn" onclick="openPolicy('web')"><i class="fa-solid fa-globe"></i> Kebijakan Website</button>
+            <button class="sidebar-btn logout-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </nav>
+
+        <div class="container">
+            <div class="hero-section">
+                <h1>Eksplorasi Tools Futuristik</h1>
+                <p>“Cari tools yang menarik sesuai kebutuhan anda ygy”</p>
+            </div>
+
+            <div class="profile-card glass">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <i class="fa-solid fa-user-astronaut"></i>
+                    </div>
+                    <div class="profile-details">
+                        <h4 id="user-display-name">-</h4>
+                        <p>@<span id="user-display-username">-</span></p>
+                        <div class="status-badge"><i class="fa-solid fa-circle"></i> Online</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span>Jam Login</span>
+                        <strong id="live-time">00:00:00</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Total Kunjungan</span>
+                        <strong id="visit-count">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tools-grid">
+                <div class="tool-card glass">
+                    <div class="tool-icon"><i class="fa-solid fa-font"></i></div>
+                    <h3>Brat Generator</h3>
+                    <p>Generator text brat aesthetic modern.</p>
+                    <button class="neon-btn" onclick="window.open('https://brat-generated.vercel.app/', '_blank')">Buka Tools</button>
+                </div>
+                <div class="tool-card glass">
+                    <div class="tool-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3>AI Image Generator</h3>
+                    <p>Generate gambar AI aesthetic futuristik.</p>
+                    <button class="neon-btn" onclick="window.open('https://ai-image-generated-three.vercel.app/', '_blank')">Buka Tools</button>
+                </div>
+                <div class="tool-card glass">
+                    <div class="tool-icon"><i class="fa-solid fa-robot"></i></div>
+                    <h3>Search HappyMod</h3>
+                    <p>Cari aplikasi HappyMod dengan cepat.</p>
+                    <button class="neon-btn" onclick="window.open('https://search-happymod.vercel.app/', '_blank')">Buka Tools</button>
+                </div>
+                <div class="tool-card glass">
+                    <div class="tool-icon"><i class="fa-brands fa-pinterest"></i></div>
+                    <h3>Search Pinterest</h3>
+                    <p>Cari inspirasi gambar Pinterest aesthetic.</p>
+                    <button class="neon-btn" onclick="window.open('https://search-pinterest.vercel.app/', '_blank')">Buka Tools</button>
+                </div>
+                <div class="tool-card glass">
+                    <div class="tool-icon"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <h3>Neo KTP Generator</h3>
+                    <p>Generator tampilan kartu identitas modern untuk simulasi UI.</p>
+                    <button class="neon-btn" onclick="window.open('https://e-ktp-generated.vercel.app/', '_blank')">Buka Tools</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="policy-popup">
+        <div class="popup-card glass">
+            <i class="fa-solid fa-xmark popup-close-x" onclick="closePopup('policy-popup')"></i>
+            <h2 id="policy-title">Kebijakan</h2>
+            <p id="policy-text">Deskripsi Kebijakan</p>
+            <button class="neon-btn" onclick="closePopup('policy-popup')">Mengerti</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="admin-notif-popup">
+        <div class="popup-card glass">
+            <i class="fa-solid fa-xmark popup-close-x" style="color:var(--neon-red);" onclick="closeAdminNotif()"></i>
+            <div class="notif-header-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <h2>PESAN ADMIN</h2>
+            <p id="notif-msg-body">Pesan sistem dari administrator.</p>
+            <span class="notif-time" id="notif-msg-time">00:00</span>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="delete-popup-screen">
+        <div class="popup-card glass">
+            <div class="notif-header-icon" style="color:var(--neon-red); text-shadow: 0 0 15px var(--neon-red);">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h2 style="color:var(--neon-red); text-shadow:0 0 10px rgba(255,51,51,0.4)">AKUN ANDA TELAH DI HAPUS!!</h2>
+            <p style="margin-bottom:20px;">Harap login/register ulang!!</p>
+            <button class="neon-btn danger" style="width:100%" onclick="forceExitToLogin()">Kembali Ke Login</button>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-wrapper"></div>
+
+    <script>
+        // Data Structures Initialization
+        let usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+        let sessionUser = sessionStorage.getItem('activeUser') || localStorage.getItem('activeUser');
+
+        // Typing Text Animation Config
+        const txt = "Welcome To RezHub";
+        let i = 0;
+        function typeWriter() {
+            if (i < txt.length) {
+                document.getElementById("type-text").innerHTML += txt.charAt(i);
+                i++;
+                setTimeout(typeWriter, 80);
+            }
+        }
+
+        // Init System Routing & Loaders
+        window.addEventListener('DOMContentLoaded', () => {
+            typeWriter();
+            
+            // Apply Ripple FX to all neon buttons
+            document.querySelectorAll('.neon-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    let ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    this.appendChild(ripple);
+                    let x = e.clientX - e.target.getBoundingClientRect().left;
+                    let y = e.clientY - e.target.getBoundingClientRect().top;
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    setTimeout(() => { ripple.remove(); }, 600);
+                });
+            });
+
+            // Transition from intro screen to dashboard or auth screen
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                intro.classList.remove('active');
+                
+                if (sessionUser) {
+                    initDashboard(sessionUser);
+                } else {
+                    document.getElementById('auth-screen').classList.add('active');
+                }
+            }, 2600);
+
+            // Synchronize operational structures across multi-tabs
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'usersDB') {
+                    usersDB = JSON.parse(e.newValue) || [];
+                    checkAccountStatus();
+                }
+                if (e.key === 'adminMessageSync') {
+                    listenToAdminMessages();
+                }
+            });
+        });
+
+        // Toggle Form Visuals Animation
+        function toggleAuthForm(target) {
+            const loginBox = document.getElementById('login-box');
+            const regBox = document.getElementById('register-box');
+            if (target === 'register') {
+                loginBox.classList.remove('active');
+                setTimeout(() => { regBox.classList.add('active'); }, 200);
+            } else {
+                regBox.classList.remove('active');
+                setTimeout(() => { loginBox.classList.add('active'); }, 200);
+            }
+        }
+
+        // Custom UI Notification Components
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toast-wrapper');
+            const toast = document.createElement('div');
+            toast.className = 'toast glass';
+            if(type === 'error') toast.style.borderLeftColor = 'var(--neon-red)';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info" style="color:${type==='error'?'var(--neon-red)':'var(--neon-blue)'}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.add('show'); }, 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { toast.remove(); }, 400);
+            }, 3500);
+        }
+
+        // Register Database Logic
+        function handleRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-fullname').value.trim();
+            const username = document.getElementById('reg-username').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const confirm = document.getElementById('reg-confirm').value;
+
+            if (username.length < 3) return showToast("Username minimal 3 karakter!", "error");
+            if (password !== confirm) return showToast("Konfirmasi password tidak cocok!", "error");
+            
+            usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+            if (usersDB.some(u => u.username === username)) {
+                return showToast("Username sudah terdaftar!", "error");
+            }
+
+            const newUser = {
+                fullName,
+                username,
+                password,
+                loginTime: "",
+                isOnline: false,
+                visits: 0
+            };
+            
+            usersDB.push(newUser);
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            showToast("Registrasi Berhasil! Silakan Login.");
+            document.getElementById('register-form').reset();
+            toggleAuthForm('login');
+        }
+
+        // Authenticate Security Credentials
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+            let userIdx = usersDB.findIndex(u => u.username === username && u.password === password);
+
+            if (userIdx === -1) {
+                return showToast("Username atau Password salah!", "error");
+            }
+
+            // Set dynamic metadata parameters
+            const timeStr = new Date().toLocaleTimeString('id-ID');
+            usersDB[userIdx].isOnline = true;
+            usersDB[userIdx].loginTime = timeStr;
+            usersDB[userIdx].visits = (usersDB[userIdx].visits || 0) + 1;
+
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            
+            // Persist valid active tokens
+            localStorage.setItem('activeUser', username);
+            sessionStorage.setItem('activeUser', username);
+            sessionUser = username;
+
+            document.getElementById('login-form').reset();
+            document.getElementById('auth-screen').classList.remove('active');
+            
+            initDashboard(username);
+        }
+
+        // Initialize user dashboard layout views
+        function initDashboard(username) {
+            usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+            const user = usersDB.find(u => u.username === username);
+            
+            if (!user) {
+                // Handle cases where an active session user was deleted from the database
+                forceTerminateSession();
+                return;
+            }
+
+            document.getElementById('user-display-name').innerText = user.fullName;
+            document.getElementById('user-display-username').innerText = user.username;
+            document.getElementById('visit-count').innerText = user.visits;
+            document.getElementById('live-time').innerText = user.loginTime;
+
+            // Display main app wrapper panel interface
+            const mainContent = document.getElementById('main-content');
+            mainContent.style.display = 'block';
+            
+            // Execute automated UI elements scroll animations reveal
+            setTimeout(() => {
+                document.querySelectorAll('.tool-card').forEach((card, idx) => {
+                    setTimeout(() => { card.classList.add('reveal'); }, idx * 100);
+                });
+            }, 100);
+
+            // Keep clock rendering dynamic running updates 
+            setInterval(() => {
+                document.getElementById('live-time').innerText = new Date().toLocaleTimeString('id-ID');
+            }, 1000);
+
+            // Execute automated periodic system notifications event scanning
+            listenToAdminMessages();
+            checkAccountStatus();
+            setInterval(checkAccountStatus, 2000);
+            setInterval(listenToAdminMessages, 1500);
+        }
+
+        // Live Track Administration Actions Verification
+        function checkAccountStatus() {
+            if (!sessionUser) return;
+            usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+            const exists = usersDB.some(u => u.username === sessionUser);
+            if (!exists) {
+                document.getElementById('delete-popup-screen').classList.add('active');
+            }
+        }
+
+        // Termination Routine Exit Management
+        function forceExitToLogin() {
+            forceTerminateSession();
+            window.location.reload();
+        }
+
+        function forceTerminateSession() {
+            localStorage.removeItem('activeUser');
+            sessionStorage.removeItem('activeUser');
+            sessionUser = null;
+        }
+
+        // Navigation Sidebar UI Layout Toggle Actions
+        function toggleSidebar(open) {
+            const side = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (open) {
+                side.classList.add('open');
+                overlay.style.display = 'block';
+            } else {
+                side.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+        }
+
+        // Integration Social Call Hyperlinks
+        function openWhatsApp() {
+            toggleSidebar(false);
+            window.open('https://wa.me/083116920767', '_blank');
+        }
+
+        // Modular Corporate System Overlays Policy Popups
+        const policyData = {
+            privacy: {
+                title: "Kebijakan Privasi",
+                text: "Data pengguna hanya disimpan di browser localStorage dan tidak dibagikan."
+            },
+            user: {
+                title: "Kebijakan Pengguna",
+                text: "Gunakan website dengan bijak dan sesuai kebutuhan."
+            },
+            web: {
+                title: "Kebijakan Website",
+                text: "Website ini dibuat untuk hiburan dan eksplorasi tools modern."
+            }
+        };
+
+        function openPolicy(key) {
+            toggleSidebar(false);
+            const modal = document.getElementById('policy-popup');
+            document.getElementById('policy-title').innerText = policyData[key].title;
+            document.getElementById('policy-text').innerText = policyData[key].text;
+            modal.classList.add('active');
+        }
+
+        function closePopup(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Core Synchronous Communications Real-Time Interfacing Engine
+        function listenToAdminMessages() {
+            if (!sessionUser) return;
+            let syncData = JSON.parse(localStorage.getItem('adminMessageSync'));
+            if (syncData && syncData.targetUser === sessionUser) {
+                // Verify against read acknowledgement signatures
+                let readReceipts = JSON.parse(localStorage.getItem('readMessages')) || [];
+                if (!readReceipts.includes(syncData.timestamp)) {
+                    document.getElementById('notif-msg-body').innerText = syncData.message;
+                    document.getElementById('notif-msg-time').innerText = syncData.timeStr;
+                    document.getElementById('admin-notif-popup').classList.add('active');
+                }
+            }
+        }
+
+        function closeAdminNotif() {
+            let syncData = JSON.parse(localStorage.getItem('adminMessageSync'));
+            if(syncData) {
+                let readReceipts = JSON.parse(localStorage.getItem('readMessages')) || [];
+                readReceipts.push(syncData.timestamp);
+                localStorage.setItem('readMessages', JSON.stringify(readReceipts));
+            }
+            closePopup('admin-notif-popup');
+        }
+
+        // Logout Processing Logic
+        function handleLogout() {
+            toggleSidebar(false);
+            usersDB = JSON.parse(localStorage.getItem('usersDB')) || [];
+            let idx = usersDB.findIndex(u => u.username === sessionUser);
+            if (idx !== -1) {
+                usersDB[idx].isOnline = false;
+                localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            }
+            forceTerminateSession();
+            showToast("Berhasil logout.");
+            setTimeout(() => { window.location.reload(); }, 600);
+        }
+    </script>
+</body>
+</html>
