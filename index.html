@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RezHub - Premium Futuristic Hub</title>
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase SDK (Libraries Utama agar Terhubung Antar HP) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         /* --- Root & Reset --- */
         :root {
@@ -105,14 +111,6 @@
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(30px, 50px) scale(1.2); }
         }
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: var(--neon-blue); }
-        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -130,6 +128,10 @@
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .fade-in { animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
@@ -256,7 +258,7 @@
             flex-direction: column;
         }
 
-        /* --- 🚀 INTRO PAGE --- */
+        /* --- 🚀 NEW INTRO LOADING SPIN PAGE --- */
         #intro-page {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -266,37 +268,36 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.8s ease, visibility 0.8s;
+            transition: opacity 0.6s ease, visibility 0.6s;
+            gap: 20px;
         }
-        .intro-typing {
-            font-size: 2rem;
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 240, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            animation: spin 1s linear infinite;
+        }
+        .intro-brand-box {
+            text-align: center;
+        }
+        .intro-title {
+            font-size: 2.2rem;
             font-weight: 700;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #fff;
-            overflow: hidden;
-            border-right: 3px solid var(--neon-blue);
-            white-space: nowrap;
-            margin-bottom: 30px;
-            width: 0;
-            animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end infinite;
-            text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
         }
-        .intro-loader-container {
-            width: 250px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
+        .intro-title span {
+            color: var(--neon-blue);
         }
-        .intro-loader-bar {
-            position: absolute;
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, transparent, var(--neon-blue));
-            box-shadow: 0 0 12px var(--neon-blue);
-            border-radius: 2px;
-            transition: width 2.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+        .intro-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-top: 2px;
         }
 
         /* --- 🔐 LOGIN & REGISTER SYSTEM --- */
@@ -889,7 +890,6 @@
             .admin-wrapper { flex-direction: column; }
             .admin-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-glass); }
             .hero-section h2 { font-size: 1.8rem; }
-            .intro-typing { font-size: 1.5rem; }
             main { padding: 30px 20px; }
             .messenger-form { flex-direction: column; align-items: stretch; }
             .select-style { min-width: 100%; }
@@ -898,19 +898,24 @@
 </head>
 <body>
 
+    <!-- Ambient Visual Effects Engine -->
     <div id="particle-container"></div>
     <div class="neon-glow-light glow-1"></div>
     <div class="neon-glow-light glow-2"></div>
 
+    <!-- Toast Notification Hub -->
     <div id="toast-container"></div>
 
+    <!-- 🚀 NEW INTRO SCREEN WITH ROUND SPINNER -->
     <div id="intro-page">
-        <div class="intro-typing">Welcome To RezHub</div>
-        <div class="intro-loader-container">
-            <div class="intro-loader-bar" id="intro-progress"></div>
+        <div class="loading-spinner"></div>
+        <div class="intro-brand-box">
+            <h1 class="intro-title">Rez<span>Hub</span></h1>
+            <p class="intro-subtitle">Premium Futuristic Hub</p>
         </div>
     </div>
 
+    <!-- 🔐 USER LOGIN PAGE -->
     <div id="page-user-login" class="app-page">
         <div class="auth-container glass-panel fade-in">
             <h2 class="auth-title">RezHub Access</h2>
@@ -935,6 +940,7 @@
         </button>
     </div>
 
+    <!-- 🔐 USER REGISTER PAGE -->
     <div id="page-user-register" class="app-page">
         <div class="auth-container glass-panel">
             <h2 class="auth-title">Create Account</h2>
@@ -964,6 +970,7 @@
         </div>
     </div>
 
+    <!-- 👑 ADMIN LOGIN PAGE -->
     <div id="page-admin-login" class="app-page">
         <div class="auth-container glass-panel">
             <h2 class="auth-title" style="linear-gradient(to right, #fff, var(--neon-pink))">Admin Core</h2>
@@ -985,6 +992,7 @@
         </div>
     </div>
 
+    <!-- 👤 USER MAIN DASHBOARD -->
     <div id="page-user-dashboard" class="app-page">
         <header>
             <div class="header-left">
@@ -999,6 +1007,7 @@
             </div>
         </header>
 
+        <!-- Sidebar Navigation Drawer -->
         <div class="sidebar-overlay" id="sidebar-overlay" onclick="uiEngine.toggleSidebar(false)"></div>
         <div class="sidebar" id="sidebar-menu">
             <div class="profile-card-details">
@@ -1029,6 +1038,7 @@
             </div>
         </div>
 
+        <!-- Main Content Area Grid Tools -->
         <main>
             <div class="hero-section">
                 <h2>Eksplorasi Navigasi Tools</h2>
@@ -1036,40 +1046,46 @@
             </div>
 
             <div class="tools-grid">
+                <!-- Grid 1 -->
                 <div class="tool-card glass-panel neon-border-blue">
                     <div class="tool-icon-box"><i class="fa-solid fa-font"></i></div>
                     <div class="tool-name">Brat Generator</div>
                     <div class="tool-desc">Generator text brat aesthetic modern kekinian dengan style text tebal minimalis untuk konten media sosial.</div>
-                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://brat-generated.vercel.app/')">Buka Tools</button>
+                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://github.com')">Buka Tools</button>
                 </div>
+                <!-- Grid 2 -->
                 <div class="tool-card glass-panel neon-border-blue">
                     <div class="tool-icon-box"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                     <div class="tool-name">AI Image Generator</div>
                     <div class="tool-desc">Simulasi arsitektur kecerdasan buatan terenkripsi tinggi untuk memproses perintah gambar futuristik premium.</div>
-                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://ai-image-generated-three.vercel.app/')">Buka Tools</button>
+                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://github.com')">Buka Tools</button>
                 </div>
+                <!-- Grid 3 -->
                 <div class="tool-card glass-panel neon-border-blue">
                     <div class="tool-icon-box"><i class="fa-solid fa-download"></i></div>
                     <div class="tool-name">Search HappyMod</div>
                     <div class="tool-desc">Koneksi engine pencarian database modifikasi aplikasi secara aman, cepat, efisien, dan komprehensif.</div>
-                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://search-happymod.vercel.app/')">Buka Tools</button>
+                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://github.com')">Buka Tools</button>
                 </div>
+                <!-- Grid 4 -->
                 <div class="tool-card glass-panel neon-border-blue">
                     <div class="tool-icon-box"><i class="fa-brands fa-pinterest"></i></div>
                     <div class="tool-name">Search Pinterest</div>
                     <div class="tool-desc">Engine terintegrasi guna menelusuri jutaan galeri foto kreatif, inspirasi visual, serta aset estetik.</div>
-                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://search-pinterest.vercel.app/')">Buka Tools</button>
+                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://pinterest.com')">Buka Tools</button>
                 </div>
+                <!-- Grid 5 -->
                 <div class="tool-card glass-panel neon-border-blue">
                     <div class="tool-icon-box"><i class="fa-solid fa-address-card"></i></div>
                     <div class="tool-name">Neo KTP Generator</div>
                     <div class="tool-desc">Modul simulasi pembuatan tata letak kartu identitas modern berkualitas tinggi sebagai pemodelan UI.</div>
-                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://e-ktp-generated.vercel.app/')">Buka Tools</button>
+                    <button class="btn-neon-blue ripple-btn" onclick="uiEngine.redirectTool('https://github.com')">Buka Tools</button>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- 👑 DASHBOARD ADMIN PANEL -->
     <div id="page-admin-dashboard" class="app-page">
         <div class="admin-wrapper">
             <aside class="admin-sidebar">
@@ -1117,10 +1133,12 @@
                             </tr>
                         </thead>
                         <tbody id="admin-user-table-body">
-                            </tbody>
+                            <!-- Injected Realtime via Cloud Database -->
+                        </tbody>
                     </table>
                 </div>
 
+                <!-- Messaging Terminal Section -->
                 <div class="messenger-panel glass-panel">
                     <h3><i class="fa-solid fa-paper-plane" style="color: var(--neon-blue);"></i> Transmisi Pesan Realtime</h3>
                     <div class="messenger-form">
@@ -1135,6 +1153,7 @@
         </div>
     </div>
 
+    <!-- 📢 GENERAL POLICY POPUP -->
     <div class="modal-overlay" id="policy-modal">
         <div class="modal-panel glass-panel">
             <button class="modal-close-x" onclick="uiEngine.closePolicy()"><i class="fa-solid fa-xmark"></i></button>
@@ -1144,15 +1163,17 @@
         </div>
     </div>
 
+    <!-- 📢 REALTIME INSTANT NOTIFICATION POPUP FOR USER -->
     <div id="live-notification-overlay">
         <div class="notification-card glass-panel">
             <button class="notif-close-btn" onclick="liveSyncEngine.closeIncomingNotification()"><i class="fa-solid fa-xmark"></i></button>
-            <div class="notif-title"><i class="fa-solid fa-envelope-open-text"></i> PESAN ADMIN</div>
+            <div class="notif-title"><i class="fa-solid fa-envelope-open-text"></i> PESAN BARU</div>
             <div class="notif-msg" id="live-notif-text">Pesan default administratif hub.</div>
             <div class="notif-time" id="live-notif-time">00:00:00</div>
         </div>
     </div>
 
+    <!-- 🚫 BAN / TERMINATION OVERLAY -->
     <div id="ban-overlay">
         <div class="ban-panel glass-panel" id="ban-panel-card">
             <div class="ban-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -1162,27 +1183,37 @@
         </div>
     </div>
 
+    <!-- --- JAVASCRIPT ENGINE DRIVER WITH CLOUD SUPPORT --- -->
     <script>
         /**
-         * INITIAL SEED DATA SYSTEM
+         * ⚠️ KONFIGURASI FIREBASE CLOUD DATABASE
+         * Jangan lupa untuk mengisi kembali data config Firebase milikmu di sini!
          */
-        if (!localStorage.getItem('rezhub_users')) {
-            localStorage.setItem('rezhub_users', JSON.stringify([]));
-        }
-        if (!localStorage.getItem('rezhub_messages')) {
-            localStorage.setItem('rezhub_messages', JSON.stringify([]));
-        }
+        const firebaseConfig = {
+            apiKey: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            authDomain: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            databaseURL: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            projectId: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            storageBucket: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            messagingSenderId: "GANTI_DENGAN_CONFIG_FIREBASE_MU",
+            appId: "GANTI_DENGAN_CONFIG_FIREBASE_MU"
+        };
+        
+        // Initialize Firebase Cloud
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
         /**
-         * CORE STATE ENGINE
+         * CORE LOCAL STATE ENGINE
          */
         const state = {
             currentUser: null,
-            currentRole: null // 'user' | 'admin'
+            currentRole: null, 
+            globalUsersCache: {}
         };
 
         /**
-         * AUDIO & UI TOAST FEEDBACK ENGINE
+         * UI TOAST FEEDBACK ENGINE
          */
         const feedbackEngine = {
             showToast(message) {
@@ -1233,7 +1264,6 @@
                 circle.style.top = `${e.clientY - rect.top - radius}px`;
                 circle.className = 'ripple';
                 
-                // Cleanup existing ripples
                 const prevRipple = button.querySelector('.ripple');
                 if (prevRipple) prevRipple.remove();
                 
@@ -1242,31 +1272,31 @@
         });
 
         /**
-         * MAIN APPLICATION ROUTING AND AUTHENTICATION
+         * MAIN APPLICATION ROUTING AND CLOUD AUTHENTICATION
          */
         const authEngine = {
             initSession() {
-                // Check Persistent State
                 const savedRole = localStorage.getItem('rezhub_active_role');
                 const savedUser = localStorage.getItem('rezhub_active_user');
 
                 if (savedRole === 'admin') {
                     state.currentRole = 'admin';
                     this.navigateToPage('page-admin-dashboard');
-                    adminEngine.renderDashboard();
+                    adminEngine.startRealtimeListener();
                 } else if (savedRole === 'user' && savedUser) {
-                    const users = JSON.parse(localStorage.getItem('rezhub_users'));
-                    const userExist = users.find(u => u.username === savedUser);
-                    if (userExist) {
-                        state.currentRole = 'user';
-                        state.currentUser = userExist;
-                        this.navigateToPage('page-user-dashboard');
-                        uiEngine.renderUserDashboard();
-                        liveSyncEngine.listenToIncomingMessages();
-                    } else {
-                        this.cleanSessionData();
-                        this.navigateToPage('page-user-login');
-                    }
+                    db.ref('users/' + savedUser).once('value', (snapshot) => {
+                        const userExist = snapshot.val();
+                        if (userExist) {
+                            state.currentRole = 'user';
+                            state.currentUser = userExist;
+                            this.navigateToPage('page-user-dashboard');
+                            uiEngine.renderUserDashboard();
+                            liveSyncEngine.startUserCloudListeners();
+                        } else {
+                            this.cleanSessionData();
+                            this.navigateToPage('page-user-login');
+                        }
+                    });
                 } else {
                     this.navigateToPage('page-user-login');
                 }
@@ -1290,35 +1320,42 @@
             handleUserRegister(e) {
                 e.preventDefault();
                 const fullName = document.getElementById('reg-fullname').value.trim();
-                const username = document.getElementById('reg-username').value.trim().toLowerCase();
+                const username = document.getElementById('reg-username').value.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
                 const password = document.getElementById('reg-password').value;
                 const confirmPassword = document.getElementById('reg-confirm-password').value;
 
+                if (username === 'reza' || username === 'all') {
+                    feedbackEngine.showToast("Username ini dilindungi sistem!");
+                    return;
+                }
                 if (password !== confirmPassword) {
                     feedbackEngine.showToast("Konfirmasi password tidak cocok!");
                     return;
                 }
 
-                let users = JSON.parse(localStorage.getItem('rezhub_users'));
-                if (users.some(u => u.username === username) || username === 'reza') {
-                    feedbackEngine.showToast("Username sudah terdaftar di ekosistem!");
-                    return;
-                }
-
-                const newUser = {
-                    fullName,
-                    username,
-                    password,
-                    loginTime: '-',
-                    isOnline: false,
-                    loginCount: 0
-                };
-
-                users.push(newUser);
-                localStorage.setItem('rezhub_users', JSON.stringify(users));
-                feedbackEngine.showToast("Registrasi Berhasil! Silakan Login.");
-                document.getElementById('form-user-register').reset();
-                this.switchAuthView('login');
+                db.ref('users/' + username).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        feedbackEngine.showToast("Username sudah digunakan di perangkat lain!");
+                    } else {
+                        const newUser = {
+                            fullName,
+                            username,
+                            password,
+                            loginTime: '-',
+                            isOnline: false,
+                            loginCount: 0
+                        };
+                        db.ref('users/' + username).set(newUser, (error) => {
+                            if (!error) {
+                                feedbackEngine.showToast("Registrasi Berhasil Terenkripsi Cloud! Silakan Login.");
+                                document.getElementById('form-user-register').reset();
+                                authEngine.switchAuthView('login');
+                            } else {
+                                feedbackEngine.showToast("Gagal mendaftar, periksa rules database!");
+                            }
+                        });
+                    }
+                });
             },
 
             handleUserLogin(e) {
@@ -1326,31 +1363,35 @@
                 const username = document.getElementById('login-user-username').value.trim().toLowerCase();
                 const password = document.getElementById('login-user-password').value;
 
-                let users = JSON.parse(localStorage.getItem('rezhub_users'));
-                const userIndex = users.findIndex(u => u.username === username && u.password === password);
+                db.ref('users/' + username).once('value', (snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData && userData.password === password) {
+                        const now = new Date();
+                        const timestamp = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        
+                        const updatedData = {
+                            ...userData,
+                            isOnline: true,
+                            loginTime: timestamp,
+                            loginCount: (userData.loginCount || 0) + 1
+                        };
 
-                if (userIndex !== -1) {
-                    const now = new Date();
-                    const timestamp = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                    
-                    users[userIndex].isOnline = true;
-                    users[userIndex].loginTime = timestamp;
-                    users[userIndex].loginCount = (users[userIndex].loginCount || 0) + 1;
+                        db.ref('users/' + username).set(updatedData).then(() => {
+                            localStorage.setItem('rezhub_active_role', 'user');
+                            localStorage.setItem('rezhub_active_user', username);
 
-                    localStorage.setItem('rezhub_users', JSON.stringify(users));
-                    localStorage.setItem('rezhub_active_role', 'user');
-                    localStorage.setItem('rezhub_active_user', username);
+                            state.currentRole = 'user';
+                            state.currentUser = updatedData;
 
-                    state.currentRole = 'user';
-                    state.currentUser = users[userIndex];
-
-                    feedbackEngine.showToast(`Selamat datang kembali, ${state.currentUser.fullName}!`);
-                    this.navigateToPage('page-user-dashboard');
-                    uiEngine.renderUserDashboard();
-                    liveSyncEngine.listenToIncomingMessages();
-                } else {
-                    feedbackEngine.showToast("Kredensial akun salah atau tidak ditemukan!");
-                }
+                            feedbackEngine.showToast(`Selamat datang, ${state.currentUser.fullName}!`);
+                            authEngine.navigateToPage('page-user-dashboard');
+                            uiEngine.renderUserDashboard();
+                            liveSyncEngine.startUserCloudListeners();
+                        });
+                    } else {
+                        feedbackEngine.showToast("Kredensial akun salah atau tidak ditemukan!");
+                    }
+                });
             },
 
             handleAdminLogin(e) {
@@ -1363,35 +1404,39 @@
                     state.currentRole = 'admin';
                     feedbackEngine.showToast("Otorisasi Admin Sukses. Membuka Core Panel.");
                     this.navigateToPage('page-admin-dashboard');
-                    adminEngine.renderDashboard();
+                    adminEngine.startRealtimeListener();
                 } else {
                     feedbackEngine.showToast("Otoritas ditolak! Password salah.");
                 }
             },
 
-            cleanSessionData() {
+            cleanSessionData(callback) {
                 const savedRole = localStorage.getItem('rezhub_active_role');
                 const savedUser = localStorage.getItem('rezhub_active_user');
 
                 if (savedRole === 'user' && savedUser) {
-                    let users = JSON.parse(localStorage.getItem('rezhub_users'));
-                    const uIdx = users.findIndex(u => u.username === savedUser);
-                    if (uIdx !== -1) {
-                        users[uIdx].isOnline = false;
-                        localStorage.setItem('rezhub_users', JSON.stringify(users));
-                    }
+                    db.ref('users/' + savedUser).child('isOnline').set(false).then(() => {
+                        localStorage.removeItem('rezhub_active_role');
+                        localStorage.removeItem('rezhub_active_user');
+                        state.currentUser = null;
+                        state.currentRole = null;
+                        if(callback) callback();
+                    });
+                } else {
+                    localStorage.removeItem('rezhub_active_role');
+                    localStorage.removeItem('rezhub_active_user');
+                    state.currentUser = null;
+                    state.currentRole = null;
+                    if(callback) callback();
                 }
-                localStorage.removeItem('rezhub_active_role');
-                localStorage.removeItem('rezhub_active_user');
-                state.currentUser = null;
-                state.currentRole = null;
             },
 
             logout() {
-                this.cleanSessionData();
-                feedbackEngine.showToast("Sesi diputus dengan aman.");
-                this.navigateToPage('page-user-login');
-                uiEngine.toggleSidebar(false);
+                this.cleanSessionData(() => {
+                    feedbackEngine.showToast("Sesi diputus dengan aman.");
+                    this.navigateToPage('page-user-login');
+                    uiEngine.toggleSidebar(false);
+                });
             },
 
             clearTerminatedSession() {
@@ -1441,7 +1486,7 @@
 
                 if (type === 'privacy') {
                     title.innerText = "Kebijakan Privasi";
-                    body.innerText = "Data pengguna hanya disimpan di browser localStorage dan tidak dibagikan.";
+                    body.innerText = "Data pengguna hanya disimpan di pangkalan data Cloud Firebase dan dienkripsi aman.";
                     icon.innerHTML = '<i class="fa-solid fa-user-shield"></i>';
                 } else if (type === 'user') {
                     title.innerText = "Kebijakan Pengguna";
@@ -1466,37 +1511,41 @@
         };
 
         /**
-         * ADMINISTRATIVE SYSTEM CORE
+         * CLOUD ADMINISTRATIVE SYSTEM CORE
          */
         const adminEngine = {
-            renderDashboard() {
-                const users = JSON.parse(localStorage.getItem('rezhub_users')) || [];
-                document.getElementById('adm-stat-total').innerText = users.length;
+            startRealtimeListener() {
+                db.ref('users').on('value', (snapshot) => {
+                    const usersData = snapshot.val() || {};
+                    state.globalUsersCache = usersData;
+                    this.processAndRender(usersData);
+                });
+            },
+
+            processAndRender(usersData) {
+                const userList = Object.values(usersData);
+                document.getElementById('adm-stat-total').innerText = userList.length;
                 
-                const activeOnline = users.filter(u => u.isOnline).length;
+                const activeOnline = userList.filter(u => u.isOnline).length;
                 document.getElementById('adm-stat-online').innerText = activeOnline;
 
-                // Populate Dropdown Messenger
                 const selectMenu = document.getElementById('msg-target-user');
                 selectMenu.innerHTML = '<option value="all">Semua Pengguna (Global)</option>';
                 
-                // Populate Table
                 const tbody = document.getElementById('admin-user-table-body');
                 tbody.innerHTML = '';
 
-                if (users.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Belum ada user teregistrasi</td></tr>`;
+                if (userList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Belum ada user terdaftar di awan</td></tr>`;
                     return;
                 }
 
-                users.forEach(user => {
-                    // Option element
+                userList.forEach(user => {
                     const opt = document.createElement('option');
                     opt.value = user.username;
                     opt.innerText = `${user.fullName} (@${user.username})`;
                     selectMenu.appendChild(opt);
 
-                    // Row Element
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${user.fullName}</td>
@@ -1538,94 +1587,56 @@
                     timestamp: timeStr
                 };
 
-                let messages = JSON.parse(localStorage.getItem('rezhub_messages')) || [];
-                messages.push(messagePayload);
-                localStorage.setItem('rezhub_messages', JSON.stringify(messages));
-
-                feedbackEngine.showToast("Pesan broadcast disiarkan secara realtime!");
-                document.getElementById('msg-content').value = '';
+                db.ref('messages').set(messagePayload).then(() => {
+                    feedbackEngine.showToast("Pesan broadcast disiarkan ke seluruh HP!");
+                    document.getElementById('msg-content').value = '';
+                });
             },
 
             deleteUser(username) {
-                let users = JSON.parse(localStorage.getItem('rezhub_users')) || [];
-                users = users.filter(u => u.username !== username);
-                localStorage.setItem('rezhub_users', JSON.stringify(users));
-                
-                // Track operation down inside dynamic message queue to push forceful logouts
-                let messages = JSON.parse(localStorage.getItem('rezhub_messages')) || [];
-                messages.push({
-                    id: Date.now(),
-                    target: username,
-                    action: 'TERMINATE'
+                db.ref('users/' + username).remove().then(() => {
+                    feedbackEngine.showToast(`Akun @${username} berhasil dihapus dari cloud.`);
                 });
-                localStorage.setItem('rezhub_messages', JSON.stringify(messages));
-
-                feedbackEngine.showToast(`Akun @${username} berhasil dihapus.`);
-                this.renderDashboard();
             }
         };
 
         /**
-         * REALTIME SYNCHRONIZATION ENGINE (localStorage Listener)
+         * REALTIME SYNCHRONIZATION LISTENER FOR USERS
          */
         const liveSyncEngine = {
-            init() {
-                window.addEventListener('storage', (e) => {
-                    // If Admin modifies something, User receives changes live
-                    if (state.currentRole === 'user') {
-                        this.listenToIncomingMessages();
-                        this.verifyAccountSurvival();
-                    }
-                    if (state.currentRole === 'admin') {
-                        adminEngine.renderDashboard();
-                    }
-                });
-
-                // Routine short cycle fallback loop for intra-tab realtime support
-                setInterval(() => {
-                    if (state.currentRole === 'user') {
-                        this.listenToIncomingMessages();
-                        this.verifyAccountSurvival();
-                    }
-                }, 1000);
-            },
-
-            listenToIncomingMessages() {
+            startUserCloudListeners() {
                 if (!state.currentUser) return;
-                const messages = JSON.parse(localStorage.getItem('rezhub_messages')) || [];
-                const readKey = `rezhub_read_${state.currentUser.username}`;
-                let readIds = JSON.parse(localStorage.getItem(readKey)) || [];
+                const username = state.currentUser.username;
 
-                messages.forEach(msg => {
-                    if (msg.message && !readIds.includes(msg.id)) {
-                        if (msg.target === 'all' || msg.target === state.currentUser.username) {
-                            this.displayIncomingNotification(msg.message, msg.timestamp);
-                            readIds.push(msg.id);
-                            localStorage.setItem(readKey, JSON.stringify(readIds));
+                db.ref('messages').on('value', (snapshot) => {
+                    const msg = snapshot.val();
+                    if (msg && msg.message) {
+                        const localReadKey = `rezhub_read_id`;
+                        const lastReadId = localStorage.getItem(localReadKey);
+
+                        if (String(msg.id) !== lastReadId) {
+                            if (msg.target === 'all' || msg.target === username) {
+                                this.displayIncomingNotification(msg.message, msg.timestamp);
+                                localStorage.setItem(localReadKey, String(msg.id));
+                            }
                         }
                     }
                 });
-            },
 
-            verifyAccountSurvival() {
-                if (!state.currentUser) return;
-                const messages = JSON.parse(localStorage.getItem('rezhub_messages')) || [];
-                const banOverlay = document.getElementById('ban-overlay');
-                
-                // Inspect termination payload
-                const terminated = messages.some(msg => msg.action === 'TERMINATE' && msg.target === state.currentUser.username);
-                
-                // Or verify directly from dynamic array pool
-                const users = JSON.parse(localStorage.getItem('rezhub_users')) || [];
-                const exist = users.some(u => u.username === state.currentUser.username);
-
-                if (terminated || !exist) {
-                    if (banOverlay.style.display !== 'flex') {
-                        banOverlay.style.display = 'flex';
-                        document.getElementById('ban-panel-card').classList.add('shake-anim');
-                        feedbackEngine.showToast("Peringatan: Hak akses dicabut!");
+                db.ref('users/' + username).on('value', (snapshot) => {
+                    if (!snapshot.exists()) {
+                        const banOverlay = document.getElementById('ban-overlay');
+                        if (banOverlay.style.display !== 'flex') {
+                            banOverlay.style.display = 'flex';
+                            document.getElementById('ban-panel-card').classList.add('shake-anim');
+                            feedbackEngine.showToast("Peringatan: Hak akses dihapus oleh admin!");
+                        }
+                    } else {
+                        const updatedInfo = snapshot.val();
+                        state.currentUser = updatedInfo;
+                        uiEngine.renderUserDashboard();
                     }
-                }
+                });
             },
 
             displayIncomingNotification(msg, time) {
@@ -1644,20 +1655,14 @@
          */
         window.addEventListener('DOMContentLoaded', () => {
             initParticles();
-            liveSyncEngine.init();
 
-            // Modern Horizontal Line Loading Animation Engine
-            const progressBar = document.getElementById('intro-progress');
-            setTimeout(() => {
-                progressBar.style.width = '100%';
-            }, 100);
-
+            // Sesi loading layar berputar selama 2.2 detik, lalu masuk ke web
             setTimeout(() => {
                 const introPage = document.getElementById('intro-page');
                 introPage.style.opacity = '0';
                 introPage.style.visibility = 'hidden';
                 authEngine.initSession();
-            }, 2600);
+            }, 2200);
         });
     </script>
 </body>
